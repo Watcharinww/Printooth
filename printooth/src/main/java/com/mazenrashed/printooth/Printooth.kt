@@ -6,7 +6,6 @@ import com.mazenrashed.printooth.data.PairedPrinter
 import com.mazenrashed.printooth.data.printer.DefaultPrinter
 import com.mazenrashed.printooth.data.printer.Printer
 import com.mazenrashed.printooth.utilities.Printing
-import io.paperdb.Paper
 
 @SuppressLint("StaticFieldLeak")
 object Printooth {
@@ -15,7 +14,6 @@ object Printooth {
     private var printing: Printing? = null
 
     fun init(context: Context) {
-        Paper.init(context)
         this.context = context
     }
 
@@ -51,12 +49,12 @@ object Printooth {
         }
     }
 
-    fun setPrinter(name: String?, address: String) = PairedPrinter.setPairedPrinter(PairedPrinter(name, address))
+    fun setPrinter(name: String?, address: String) = PairedPrinter.setPairedPrinter(context, PairedPrinter(name, address))
 
-    fun getPairedPrinter(): PairedPrinter? = PairedPrinter.getPairedPrinter()
+    fun getPairedPrinter(): PairedPrinter? = PairedPrinter.getPairedPrinter(context)
 
-    fun hasPairedPrinter(): Boolean = PairedPrinter.getPairedPrinter() != null
+    fun hasPairedPrinter(): Boolean = PairedPrinter.getPairedPrinter(context) != null
 
-    fun removeCurrentPrinter() = PairedPrinter.removePairedPrinter()
+    fun removeCurrentPrinter() = PairedPrinter.removePairedPrinter(context)
 
 }
