@@ -40,11 +40,14 @@ class ScanningActivity : AppCompatActivity() {
         setContentView(R.layout.activity_scanning)
 
         bluetooth = Bluetooth(this)
-
-        if (checkBluetoothPermission()) {
-            setup()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (checkBluetoothPermission()) {
+                setup()
+            } else {
+                requestBluetoothPermission()
+            }
         } else {
-            requestBluetoothPermission()
+            setup()
         }
     }
 
@@ -153,8 +156,7 @@ class ScanningActivity : AppCompatActivity() {
     }
 
     private fun checkBluetoothPermission(): Boolean {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-                && ContextCompat.checkSelfPermission(
+        return ContextCompat.checkSelfPermission(
                 this,
                     Manifest.permission.BLUETOOTH_CONNECT
                 ) == PackageManager.PERMISSION_GRANTED
