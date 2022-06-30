@@ -1,8 +1,11 @@
 package com.mazenrashed.printooth.ui
 
+import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -13,6 +16,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.afollestad.assent.Permission
 import com.afollestad.assent.runWithPermissions
 import com.mazenrashed.printooth.Printooth
@@ -26,15 +31,28 @@ class ScanningActivity : AppCompatActivity() {
     private var devices = ArrayList<BluetoothDevice>()
     private lateinit var adapter: BluetoothDevicesAdapter
 
+    val PERMISSION_GRANTED_CODE = 101
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanning)
-        adapter = BluetoothDevicesAdapter(this)
+
         bluetooth = Bluetooth(this)
-        setup()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (checkBluetoothPermission()) {
+                setup()
+            } else {
+                requestBluetoothPermission()
+            }
+        } else {
+            setup()
+        }
     }
 
     private fun setup() {
+        adapter = BluetoothDevicesAdapter(this)
         initViews()
         initListeners()
         initDeviceCallback()
@@ -107,7 +125,54 @@ class ScanningActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        startScanning()
+    }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>, grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == PERMISSION_GRANTED_CODE) {
+            if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
+                setup()
+            } else {
+                Toast.makeText(this, "Permission Not Granted", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun requestBluetoothPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            requestPermissions(arrayOf(
+                Manifest.permission.BLUETOOTH_ADVERTISE,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.BLUETOOTH_SCAN
+            ),PERMISSION_GRANTED_CODE)
+
+        }
+    }
+
+    private fun checkBluetoothPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+                this,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                ) == PackageManager.PERMISSION_GRANTED
+                &&
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.BLUETOOTH_ADVERTISE
+                ) == PackageManager.PERMISSION_GRANTED
+                &&
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.BLUETOOTH_SCAN
+                ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun startScanning() {
         runWithPermissions(Permission.ACCESS_FINE_LOCATION) {
             bluetooth.onStart()
             if (!bluetooth.isEnabled)
@@ -116,7 +181,6 @@ class ScanningActivity : AppCompatActivity() {
                 bluetooth.startScanning()
             }, 1000)
         }
-
     }
 
     override fun onStop() {
