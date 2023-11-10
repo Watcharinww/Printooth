@@ -1,11 +1,12 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 31
-
+    buildFeatures {
+        viewBinding = true
+    }
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 31
@@ -52,8 +53,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     //Runtime permissions
     implementation 'com.afollestad.assent:core:3.0.0-RC4'
-    implementation 'com.android.support:design:31.0.0'
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
 }
-repositories {
-    mavenCentral()
-}
+
