@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.mazenrashed.example.databinding.ActivityMainBinding
 import com.mazenrashed.printooth.Printooth
 import com.mazenrashed.printooth.data.converter.ArabicConverter
 import com.mazenrashed.printooth.data.printable.ImagePrintable
@@ -12,18 +13,20 @@ import com.mazenrashed.printooth.data.printable.Printable
 import com.mazenrashed.printooth.data.printable.RawPrintable
 import com.mazenrashed.printooth.data.printable.TextPrintable
 import com.mazenrashed.printooth.data.printer.DefaultPrinter
+import com.mazenrashed.printooth.databinding.ActivityScanningBinding
 import com.mazenrashed.printooth.ui.ScanningActivity
 import com.mazenrashed.printooth.utilities.Printing
 import com.mazenrashed.printooth.utilities.PrintingCallback
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     private var printing : Printing? = null
-    
+    lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         if (Printooth.hasPairedPrinter())
             printing = Printooth.printer()
         initViews()
@@ -31,32 +34,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        btnPiarUnpair.text = if (Printooth.hasPairedPrinter()) "Un-pair ${Printooth.getPairedPrinter()?.name}" else "Pair with printer"
+        binding.btnPiarUnpair.text = if (Printooth.hasPairedPrinter()) "Un-pair ${Printooth.getPairedPrinter()?.name}" else "Pair with printer"
     }
 
     private fun initListeners() {
-        btnPrint.setOnClickListener {
+        binding.btnPrint.setOnClickListener {
             if (!Printooth.hasPairedPrinter()) startActivityForResult(Intent(this,
                     ScanningActivity::class.java),
                     ScanningActivity.SCANNING_FOR_PRINTER)
             else printSomePrintable()
         }
 
-        btnPrintImages.setOnClickListener {
+        binding.btnPrintImages.setOnClickListener {
             if (!Printooth.hasPairedPrinter()) startActivityForResult(Intent(this,
                     ScanningActivity::class.java),
                     ScanningActivity.SCANNING_FOR_PRINTER)
             else printSomeImages()
         }
 
-        btnPiarUnpair.setOnClickListener {
+        binding.btnPiarUnpair.setOnClickListener {
             if (Printooth.hasPairedPrinter()) Printooth.removeCurrentPrinter()
             else startActivityForResult(Intent(this, ScanningActivity::class.java),
                     ScanningActivity.SCANNING_FOR_PRINTER)
             initViews()
         }
 
-        btnCustomPrinter.setOnClickListener {
+        binding.btnCustomPrinter.setOnClickListener {
             startActivity(Intent(this, WoosimActivity::class.java))
         }
 
@@ -79,6 +82,10 @@ class MainActivity : AppCompatActivity() {
 
             override fun onMessage(message: String) {
                 Toast.makeText(this@MainActivity, "Message: $message", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun disconnected() {
+                Toast.makeText(this@MainActivity, "Disconnected Printer", Toast.LENGTH_SHORT).show()
             }
 
         }

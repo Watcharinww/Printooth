@@ -2,15 +2,17 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 
-apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
 
 android {
+    buildFeatures {
+        viewBinding = true
+    }
     compileSdkVersion 31
     defaultConfig {
         applicationId "com.mazenrashed.universalbluetoothprinter"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 31
         versionCode 1
         versionName "1.0"

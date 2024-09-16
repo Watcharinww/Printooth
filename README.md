@@ -66,6 +66,7 @@ To print `Hello World` simply, write this code:
 var printables = ArrayList<Printable>()
 var printable = TextPrintable.Builder()  
         .setText("Hello World")
+        .build()
 printables.add(printable)
 Printooth.printer().print(printables)
 ```
@@ -131,7 +132,7 @@ Create a class from type `Printer` and override the initializers method, then re
     override fun initPrintingImagesHelper(): PrintingImagesHelper = DefaultPrintingImagesHelper()
 }
 ```
-If you have issues with printing images, you can implement the process of transfaring image from bitmap to ByteArray manuly by extends PrintingImagesHelper class and implement getBitmapAsByteArray, then you shold return an object from your helper to initPrintingImagesHelper() as this example:
+If you have issues with printing images, you can implement the process of transfaring image from bitmap to ByteArray manually by extends PrintingImagesHelper class and implement getBitmapAsByteArray, then you shold return an object from your helper to initPrintingImagesHelper() as this example:
 ```kotlin
 class MyPrintingImagesHelper : PrintingImagesHelper {  
     override fun getBitmapAsByteArray(bitmap: Bitmap): ByteArray {  
